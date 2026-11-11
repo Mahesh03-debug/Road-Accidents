@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Data Quality & Acceptance Criteria Audit — Road Accident Data Analysis{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-3">
+    <div class="col-md-8">
+        <h4 class="fw-bold mb-1"><i class="bi bi-patch-check-fill text-success me-2"></i>Data Governance & Acceptance Criteria Audit</h4>
+        <p class="text-muted small mb-0">Auditing missing data, documenting location granularity and source provenance, and certifying non-PII compliance.</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <span class="badge bg-success fs-6 px-3 py-2">
+            <i class="bi bi-shield-check me-1"></i> Audit Status: Fully Compliant
+        </span>
+    </div>
+</div>
+
+<!-- Acceptance Criteria Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-primary h-100">
+            <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-file-earmark-diff fs-3 text-primary me-2"></i>
+                <div>
+                    <h6 class="fw-bold mb-0">Criterion 1: Missing Data</h6>
+                    <small class="text-muted">Audit & Transparency</small>
+                </div>
+            </div>
+            <p class="small text-secondary mb-2">
+                All optional and mandatory columns are systematically tracked. Missing rates are quantified and documented below.
+            </p>
+            <div class="mt-auto">
+                <span class="badge bg-info text-dark">Data Completeness: {{ audit.completeness_score_pct }}%</span>
+                <span class="badge bg-success">Mandatory Fields: 100%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-info h-100">
+            <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-pin-map fs-3 text-info me-2"></i>
+                <div>
+                    <h6 class="fw-bold mb-0">Criterion 2: Location Granularity</h6>
+                    <small class="text-muted">Hierarchical Spatial Scope</small>
+                </div>
+            </div>
+            <p class="small text-secondary mb-2">
+                Spatial dimensions operate at two documented levels: Macro Regions (zones) and Micro Corridors (road corridors).
+            </p>
+            <div class="mt-auto">
+                <span class="badge bg-light text-dark border">{{ audit.location_granularity.unique_regions_count }} Regions</span>
+                <span class="badge bg-light text-dark border">{{ audit.location_granularity.unique_road_corridors_count }} Road Corridors</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-custom p-3 border-start border-4 border-success h-100">
+            <div class="d-flex align-items-center mb-2">
+                <i class="bi bi-incognito fs-3 text-success me-2"></i>
+                <div>
+                    <h6 class="fw-bold mb-0">Criterion 3: Privacy & Non-PII</h6>
+                    <small class="text-muted">Zero Identifying Details</small>
+                </div>
+            </div>
+            <p class="small text-secondary mb-2">
+                Automated regex scanner verifies absence of names, phone numbers, emails, vehicle registration numbers, or IDs.
+            </p>
+            <div class="mt-auto">
+                <span class="badge bg-success">{{ audit.pii_compliance_status }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Missing Data Report Table -->
+<div class="card card-custom p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+        <h5 class="fw-bold mb-0 text-dark">
+            <i class="bi bi-table text-primary me-2"></i>Systematic Missing Data Audit Report
+        </h5>
+        <span class="small text-muted">Audited Records: <strong>{{ audit.total_records }}</strong></span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Column / Field Name</th>
+                    <th>Requirement Type</th>
+                    <th class="text-center">Missing Count</th>
+                    <th class="text-center">Missing %</th>
+                    <th>Analytical Handling Strategy</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for col, info in audit.missing_fields.items() %}
+                <tr>
+                    <td class="fw-bold text-dark font-monospace">{{ col }}</td>
+                    <td>
+                        {% if info.is_mandatory %}
+                        <span class="badge bg-success">Mandatory Field</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Optional Field</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center fw-semibold">
+                        {% if info.missing_count > 0 %}
+                        <span class="text-warning fw-bold">{{ info.missing_count }}</span>
+                        {% else %}
+                        <span class="text-success">0</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <div class="d-flex align-items-center justify-content-center gap-2">
+                            <span class="small">{{ info.missing_percentage }}%</span>
+                            <div class="progress" style="width: 60px; height: 6px;">
+                                <div class="progress-bar {% if info.missing_percentage > 0 %}bg-warning{% else %}bg-success{% endif %}" style="width: {{ info.missing_percentage }}%;"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="small text-muted">
+                        {% if col == 'road_name_optional' %}
+                        Imputed as <code>Unspecified Road</code>; aggregated under macro regional district.
+                        {% elif col == 'weather_optional' %}
+                        Categorized as <code>Unrecorded Weather</code> in environmental contingency tables.
+                        {% elif col == 'light_condition_optional' %}
+                        Categorized as <code>Unrecorded Lighting</code>; daytime/nighttime inferred where possible.
+                        {% elif col == 'notes_optional' %}
+                        Optional free-text context field. Empty when no physical scene context recorded.
+                        {% elif col == 'casualty_count_optional' %}
+                        Defaulted to <code>0</code> when no human casualties were recorded on scene.
+                        {% else %}
+                        Strictly validated during record ingestion. Rejections enforced for missing entries.
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Location Granularity & Source Documentation -->
+<div class="row g-4 mb-4">
+    <!-- Location Granularity Documentation -->
+    <div class="col-lg-6">
+        <div class="card card-custom p-4 h-100">
+            <h5 class="fw-bold mb-3 text-dark">
+                <i class="bi bi-geo text-info me-2"></i>Location Granularity Specification
+            </h5>
+            <ul class="list-group list-group-flush small mb-3">
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <span class="fw-semibold">Granularity Architecture:</span>
+                    <span>{{ audit.location_granularity.level }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <span class="fw-semibold">Macro Regions Monitored:</span>
+                    <span class="badge bg-primary rounded-pill">{{ audit.location_granularity.unique_regions_count }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <span class="fw-semibold">Micro Road Corridors Identified:</span>
+                    <span class="badge bg-info text-dark rounded-pill">{{ audit.location_granularity.unique_road_corridors_count }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <span class="fw-semibold">Corridor Reporting Completeness:</span>
+                    <span>{{ audit.location_granularity.road_name_reporting_rate_pct }}% of all incidents</span>
+                </li>
+            </ul>
+            <div class="p-3 bg-light rounded border text-muted small">
+                <strong>Architectural Granularity Rationale:</strong> Regional aggregation satisfies administrative sector reporting (e.g. municipal resource allocation), while optional road corridor tags enable precise blackspot discovery without geolocating to exact private residential premises.
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Provenance & Source Documentation -->
+    <div class="col-lg-6">
+        <div class="card card-custom p-4 h-100">
+            <h5 class="fw-bold mb-3 text-dark">
+                <i class="bi bi-journal-code text-secondary me-2"></i>Data Source Provenance & Privacy Standard
+            </h5>
+            <ul class="list-group list-group-flush small mb-3">
+                <li class="list-group-item px-0">
+                    <div class="fw-semibold">Dataset Provenance:</div>
+                    <div class="text-muted">{{ audit.data_source_documentation.provenance }}</div>
+                </li>
+                <li class="list-group-item px-0">
+                    <div class="fw-semibold">Anonymization & Privacy Standard:</div>
+                    <div class="text-muted">{{ audit.data_source_documentation.anonymization_standard }}</div>
+                </li>
+                <li class="list-group-item px-0">
+                    <div class="fw-semibold">Analytical Objective:</div>
+                    <div class="text-muted">{{ audit.data_source_documentation.purpose }}</div>
+                </li>
+            </ul>
+            <div class="alert alert-success d-flex align-items-center mb-0 p-3 small">
+                <i class="bi bi-check-circle-fill fs-4 me-3 text-success"></i>
+                <div>
+                    <strong>PII Audit Verification:</strong> No personal names, telephone numbers, emails, national identity identifiers (SSN/Aadhaar), or vehicle license plates are present or stored.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

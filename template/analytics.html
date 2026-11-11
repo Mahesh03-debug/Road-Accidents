@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Pattern Analytics & NumPy Statistics — Road Accident Data Analysis{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-3">
+    <div class="col-md-8">
+        <h4 class="fw-bold mb-1"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Multi-Dimensional Pattern Analytics</h4>
+        <p class="text-muted small mb-0">Pandas grouping across temporal and geographic strata combined with NumPy descriptive estimators.</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <a href="{{ url_for('reports_view') }}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Export Executive Report
+        </a>
+    </div>
+</div>
+
+<!-- NumPy Descriptive Statistics Section -->
+<div class="card card-custom p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+        <h5 class="fw-bold mb-0 text-dark">
+            <i class="bi bi-calculator me-2 text-info"></i>NumPy Descriptive Statistical Estimators
+        </h5>
+        <span class="badge bg-primary">NumPy 2.5 Array Calculations</span>
+    </div>
+
+    <div class="row g-4">
+        <!-- Hourly Distribution Stats -->
+        <div class="col-md-4">
+            <div class="p-3 bg-light rounded-3 h-100 border">
+                <h6 class="fw-bold text-secondary text-uppercase small mb-3">Hourly Incident Frequency (0-23h)</h6>
+                <ul class="list-unstyled mb-0 small">
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>Mean (&mu;):</span>
+                        <strong class="text-dark">{{ summary.numpy_descriptive_statistics.hourly_statistics.mean }} / hr</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>Median:</span>
+                        <strong>{{ summary.numpy_descriptive_statistics.hourly_statistics.median }}</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>Std Dev (&sigma;):</span>
+                        <strong>&plusmn; {{ summary.numpy_descriptive_statistics.hourly_statistics.std_dev }}</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>Variance (&sigma;&sup2;):</span>
+                        <strong>{{ summary.numpy_descriptive_statistics.hourly_statistics.variance }}</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>Interquartile Range (IQR):</span>
+                        <strong>{{ summary.numpy_descriptive_statistics.hourly_statistics.iqr }}</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-1">
+                        <span>Skewness Index:</span>
+                        <strong>{{ summary.numpy_descriptive_statistics.hourly_statistics.skewness }}</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Daily Volume Stats -->
+        <div class="col-md-4">
+            <div class="p-3 bg-light rounded-3 h-100 border">
+                <h6 class="fw-bold text-secondary text-uppercase small mb-3">Daily Incident Volume (365 Days)</h6>
+                <ul class="list-unstyled mb-0 small">
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>Mean Accidents / Day:</span>
+                        <strong class="text-dark">{{ summary.numpy_descriptive_statistics.daily_statistics.mean_accidents_per_day }}</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>Median Accidents / Day:</span>
+                        <strong>{{ summary.numpy_descriptive_statistics.daily_statistics.median_accidents_per_day }}</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>Standard Deviation:</span>
+                        <strong>&plusmn; {{ summary.numpy_descriptive_statistics.daily_statistics.std_dev }}</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>Min / Max in a Day:</span>
+                        <strong>{{ summary.numpy_descriptive_statistics.daily_statistics.min_per_day }} / {{ summary.numpy_descriptive_statistics.daily_statistics.max_per_day }}</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-1">
+                        <span>95% Confidence Interval:</span>
+                        <strong class="text-primary">[{{ summary.numpy_descriptive_statistics.daily_statistics.ci_95_percent.lower }} &ndash; {{ summary.numpy_descriptive_statistics.daily_statistics.ci_95_percent.upper }}]</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Association & Correlation Stats -->
+        <div class="col-md-4">
+            <div class="p-3 bg-light rounded-3 h-100 border">
+                <h6 class="fw-bold text-secondary text-uppercase small mb-3">Association vs Causation Metrics</h6>
+                <ul class="list-unstyled mb-0 small">
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>Chi-Square (&chi;&sup2;):</span>
+                        <strong>{{ summary.association_analysis.chi_square_stat }}</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>P-Value:</span>
+                        <strong>{{ summary.association_analysis.p_value }}</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>Cram&eacute;r's V:</span>
+                        <strong class="text-success">{{ summary.association_analysis.cramers_v }}</strong>
+                    </li>
+                    <li class="d-flex justify-content-between py-1 border-bottom">
+                        <span>Association Level:</span>
+                        <span class="badge bg-secondary">{{ summary.association_analysis.association_strength }}</span>
+                    </li>
+                    <li class="py-1 mt-1 text-muted" style="font-size: 0.75rem;">
+                        <em>Note: Association measures strength of co-occurrence, NOT direct causality.</em>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Time Grouping Tables -->
+<div class="row g-4 mb-4">
+    <!-- Time Bins -->
+    <div class="col-lg-6">
+        <div class="card card-custom p-3 h-100">
+            <h6 class="fw-bold mb-3"><i class="bi bi-clock me-1 text-primary"></i> Accidents by Diurnal Commute Windows</h6>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm small align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Commute Window</th>
+                            <th class="text-center">Total</th>
+                            <th class="text-center">Share (%)</th>
+                            <th class="text-center">Avg Severity</th>
+                            <th class="text-end">Fatalities</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tb in summary.time_analysis.time_bins %}
+                        <tr>
+                            <td class="fw-semibold">{{ tb.time_bin }}</td>
+                            <td class="text-center">{{ tb.total_accidents }}</td>
+                            <td class="text-center">{{ "%.1f"|format(tb.pct_of_total) }}%</td>
+                            <td class="text-center">{{ "%.2f"|format(tb.avg_severity_weight) }}</td>
+                            <td class="text-end">
+                                {% if tb.total_fatalities > 0 %}
+                                <span class="badge bg-danger">{{ tb.total_fatalities }}</span>
+                                {% else %}
+                                <span class="badge bg-light text-muted border">0</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day of Week & Weekend Comparison -->
+    <div class="col-lg-6">
+        <div class="card card-custom p-3 h-100">
+            <h6 class="fw-bold mb-3"><i class="bi bi-calendar3 me-1 text-primary"></i> Day of Week & Weekend Dynamics</h6>
+            <div class="table-responsive mb-3">
+                <table class="table table-hover table-sm small align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th class="text-center">Accident Count</th>
+                            <th class="text-center">Share (%)</th>
+                            <th class="text-end">Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for day, cnt, pct in summary.time_analysis.day_of_week.days | zip(summary.time_analysis.day_of_week.counts, summary.time_analysis.day_of_week.percentages) %}
+                        <tr>
+                            <td class="fw-semibold">{{ day }}</td>
+                            <td class="text-center">{{ cnt }}</td>
+                            <td class="text-center">{{ pct }}%</td>
+                            <td class="text-end">
+                                {% if day in ['Saturday', 'Sunday'] %}
+                                <span class="badge bg-warning text-dark">Weekend</span>
+                                {% else %}
+                                <span class="badge bg-light text-secondary border">Weekday</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Location & Vehicle Groupings -->
+<div class="row g-4">
+    <!-- Region Hotspots Table -->
+    <div class="col-lg-7">
+        <div class="card card-custom p-3">
+            <h6 class="fw-bold mb-3"><i class="bi bi-geo-alt me-1 text-success"></i> Regional Accident Hierarchy & Severity Breakdown</h6>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm small align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Region</th>
+                            <th class="text-center">Count</th>
+                            <th class="text-center">Share</th>
+                            <th class="text-center">Fatal</th>
+                            <th class="text-center">Severe</th>
+                            <th class="text-end">Risk Index</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in summary.location_analysis.by_region %}
+                        <tr>
+                            <td class="fw-semibold">{{ r.region }}</td>
+                            <td class="text-center">{{ r.total_accidents }}</td>
+                            <td class="text-center">{{ "%.1f"|format(r.percentage) }}%</td>
+                            <td class="text-center"><span class="badge bg-danger">{{ r.fatal_count }}</span></td>
+                            <td class="text-center"><span class="badge bg-warning text-dark">{{ r.severe_count }}</span></td>
+                            <td class="text-end fw-bold text-primary">{{ "%.1f"|format(r.risk_index) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vehicle Vulnerability Ranking -->
+    <div class="col-lg-5">
+        <div class="card card-custom p-3">
+            <h6 class="fw-bold mb-3"><i class="bi bi-shield-x me-1 text-danger"></i> Vehicle Vulnerability Index</h6>
+            <div class="table-responsive">
+                <table class="table table-hover table-sm small align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Vehicle Category</th>
+                            <th class="text-center">Total</th>
+                            <th class="text-end">% Severe / Fatal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for v in summary.association_analysis.vulnerability_ranking %}
+                        <tr>
+                            <td class="fw-semibold">{{ v.vehicle_type }}</td>
+                            <td class="text-center">{{ v.total }}</td>
+                            <td class="text-end">
+                                <span class="badge {% if v.fatal_or_severe_pct > 25 %}bg-danger{% else %}bg-secondary{% endif %}">
+                                    {{ "%.1f"|format(v.fatal_or_severe_pct) }}%
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="small text-muted mt-3 p-2 bg-light rounded border">
+                <strong>Empirical Observation:</strong> Non-enclosed vehicles (Two-Wheelers, Bicycles) and Pedestrians exhibit substantially higher proportions of severe and fatal consequences compared to enclosed Passenger Cars.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Ingest Accident Record — Road Accident Data Analysis{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card card-custom p-4">
+            <div class="border-bottom pb-3 mb-4">
+                <h4 class="fw-bold mb-1"><i class="bi bi-file-earmark-plus text-primary me-2"></i>Ingest New Accident Record</h4>
+                <p class="text-muted small mb-0">Record validation will run automatically. Note: Strict PII screening prevents personal names, phone numbers, or license plates.</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('add_record') }}" id="recordForm">
+                <div class="row g-3">
+                    <!-- Date & Time -->
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Date & Time of Incident <span class="text-danger">*</span></label>
+                        <input type="datetime-local" class="form-control" name="accident_datetime" required max="{{ current_time }}">
+                        <div class="form-text small">Cannot be set in the future.</div>
+                    </div>
+
+                    <!-- Severity -->
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Severity Classification <span class="text-danger">*</span></label>
+                        <select class="form-select" name="severity" required>
+                            <option value="">Choose Severity Tier...</option>
+                            <option value="Minor">Minor (Property damage / slight scratch)</option>
+                            <option value="Moderate">Moderate (Non-critical medical care required)</option>
+                            <option value="Severe">Severe (Hospitalization / major structural damage)</option>
+                            <option value="Fatal">Fatal (Confirmed fatality on scene or transit)</option>
+                        </select>
+                    </div>
+
+                    <!-- Region -->
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Macro Geographic Region <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="region" list="existingRegions" placeholder="e.g. Downtown Commercial District" required>
+                        <datalist id="existingRegions">
+                            {% for reg in existing_regions %}
+                            <option value="{{ reg }}">
+                            {% endfor %}
+                        </datalist>
+                        <div class="form-text small">Standardized administrative zone or district.</div>
+                    </div>
+
+                    <!-- Road Name Optional -->
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Road Corridor / Street Name <span class="text-muted">(Optional)</span></label>
+                        <input type="text" class="form-control" name="road_name_optional" placeholder="e.g. Main Street Arterial, Outer Ring Road">
+                        <div class="form-text small">Micro-granularity hotspot indicator.</div>
+                    </div>
+
+                    <!-- Area Type -->
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Area Classification</label>
+                        <select class="form-select" name="area_type">
+                            <option value="Urban">Urban</option>
+                            <option value="Suburban">Suburban</option>
+                            <option value="Highway">Highway</option>
+                            <option value="Rural">Rural</option>
+                        </select>
+                    </div>
+
+                    <!-- Vehicle Type -->
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Vehicle Classification <span class="text-danger">*</span></label>
+                        <select class="form-select" name="vehicle_type" required>
+                            <option value="">Select Primary Vehicle...</option>
+                            {% for vt in vehicle_types %}
+                            <option value="{{ vt }}">{{ vt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Casualty Count -->
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">Casualty Count</label>
+                        <input type="number" class="form-control" name="casualty_count_optional" min="0" value="0">
+                    </div>
+
+                    <!-- Weather Optional -->
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Atmospheric Weather <span class="text-muted">(Optional)</span></label>
+                        <select class="form-select" name="weather_optional">
+                            <option value="">Not Recorded / Unknown</option>
+                            <option value="Clear">Clear / Dry</option>
+                            <option value="Rain">Rain / Wet Roadway</option>
+                            <option value="Fog / Mist">Fog / Mist / Low Visibility</option>
+                            <option value="Heavy Wind">Heavy Wind / Storm</option>
+                            <option value="Overcast / Cloudy">Overcast / Cloudy</option>
+                        </select>
+                    </div>
+
+                    <!-- Light Condition Optional -->
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold">Lighting Condition <span class="text-muted">(Optional)</span></label>
+                        <select class="form-select" name="light_condition_optional">
+                            <option value="">Not Recorded / Unknown</option>
+                            <option value="Daylight">Daylight</option>
+                            <option value="Dusk / Dawn">Dusk / Dawn Twilight</option>
+                            <option value="Dark - Streetlights On">Dark - Streetlights Functioning</option>
+                            <option value="Dark - No Streetlights">Dark - No Streetlights / Off</option>
+                        </select>
+                    </div>
+
+                    <!-- Notes Non-PII -->
+                    <div class="col-12">
+                        <label class="form-label small fw-bold">Incident Context Notes <span class="text-muted">(Optional — Strictly Non-PII)</span></label>
+                        <textarea class="form-control" name="notes_optional" rows="3" placeholder="Describe road surface, collision angle, skid distance. Do NOT enter personal names, phone numbers, or license plate numbers."></textarea>
+                        <div class="form-text text-warning small">
+                            <i class="bi bi-shield-check"></i> Automated scanner will reject submissions with phone numbers, emails, or vehicle plate numbers.
+                        </div>
+                    </div>
+
+                    <div class="col-12 text-end pt-3 border-top">
+                        <a href="{{ url_for('records_list') }}" class="btn btn-outline-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check2-circle me-1"></i> Validate & Save Record
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Analytical Reports & Matplotlib Visualizations{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+    <div class="col-md-7">
+        <h4 class="fw-bold mb-1"><i class="bi bi-file-earmark-bar-graph text-primary me-2"></i>Executive Reports & Matplotlib Chart Suite</h4>
+        <p class="text-muted small mb-0">Publication-quality visual figures and analytical trend reports ready for policy evaluation.</p>
+    </div>
+    <div class="col-md-5 text-md-end mt-2 mt-md-0">
+        <a href="{{ url_for('download_html_report') }}" class="btn btn-primary btn-sm px-3 shadow-sm me-2">
+            <i class="bi bi-file-earmark-arrow-down me-1"></i> Download Standalone Report (HTML)
+        </a>
+        <a href="{{ url_for('regenerate_charts') }}" class="btn btn-outline-secondary btn-sm px-3 shadow-sm">
+            <i class="bi bi-arrow-clockwise me-1"></i> Refresh Charts
+        </a>
+    </div>
+</div>
+
+<!-- Master Composite Dashboard -->
+<div class="card card-custom p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h5 class="fw-bold mb-0">High-Resolution Analytical Dashboard (Composite Matplotlib Figure)</h5>
+            <small class="text-muted">Multi-panel comparative synthesis for decision makers</small>
+        </div>
+        <a href="/static/charts/accident_analysis_dashboard.png" target="_blank" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-arrows-fullscreen me-1"></i> Open Fullscreen
+        </a>
+    </div>
+    <div class="text-center bg-light p-2 rounded border">
+        <img src="/static/charts/accident_analysis_dashboard.png?t={{ timestamp }}" class="img-fluid rounded shadow-sm" alt="Composite Dashboard">
+    </div>
+</div>
+
+<!-- Grid of Individual Matplotlib Figures -->
+<div class="row g-4 mb-4">
+    <!-- Chart 1: Hourly Distribution -->
+    <div class="col-lg-6">
+        <div class="card card-custom p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0">1. Hourly Accident Frequency (24-Hour Cycle)</h6>
+                <a href="/static/charts/accidents_by_hour.png" download class="btn btn-sm btn-light border py-0 px-2"><i class="bi bi-download"></i></a>
+            </div>
+            <img src="/static/charts/accidents_by_hour.png?t={{ timestamp }}" class="img-fluid rounded border mt-2" alt="Hourly Chart">
+        </div>
+    </div>
+
+    <!-- Chart 2: Day of Week -->
+    <div class="col-lg-6">
+        <div class="card card-custom p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0">2. Day of Week (Weekday vs Weekend Dynamics)</h6>
+                <a href="/static/charts/accidents_by_day_of_week.png" download class="btn btn-sm btn-light border py-0 px-2"><i class="bi bi-download"></i></a>
+            </div>
+            <img src="/static/charts/accidents_by_day_of_week.png?t={{ timestamp }}" class="img-fluid rounded border mt-2" alt="Day of Week Chart">
+        </div>
+    </div>
+
+    <!-- Chart 3: Severity Distribution -->
+    <div class="col-lg-6">
+        <div class="card card-custom p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0">3. Severity Categories Proportion & Counts</h6>
+                <a href="/static/charts/severity_distribution.png" download class="btn btn-sm btn-light border py-0 px-2"><i class="bi bi-download"></i></a>
+            </div>
+            <img src="/static/charts/severity_distribution.png?t={{ timestamp }}" class="img-fluid rounded border mt-2" alt="Severity Chart">
+        </div>
+    </div>
+
+    <!-- Chart 4: Location Hotspots -->
+    <div class="col-lg-6">
+        <div class="card card-custom p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0">4. Regional Hotspots Identification</h6>
+                <a href="/static/charts/location_hotspots.png" download class="btn btn-sm btn-light border py-0 px-2"><i class="bi bi-download"></i></a>
+            </div>
+            <img src="/static/charts/location_hotspots.png?t={{ timestamp }}" class="img-fluid rounded border mt-2" alt="Hotspots Chart">
+        </div>
+    </div>
+
+    <!-- Chart 5: Vehicle Type vs Severity -->
+    <div class="col-lg-6">
+        <div class="card card-custom p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0">5. Vehicle Type Severity Vulnerability</h6>
+                <a href="/static/charts/vehicle_type_vs_severity.png" download class="btn btn-sm btn-light border py-0 px-2"><i class="bi bi-download"></i></a>
+            </div>
+            <img src="/static/charts/vehicle_type_vs_severity.png?t={{ timestamp }}" class="img-fluid rounded border mt-2" alt="Vehicle Severity Chart">
+        </div>
+    </div>
+
+    <!-- Chart 6: Monthly Trend -->
+    <div class="col-lg-6">
+        <div class="card card-custom p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0">6. Longitudinal Monthly Trend Over Time</h6>
+                <a href="/static/charts/monthly_trend_analysis.png" download class="btn btn-sm btn-light border py-0 px-2"><i class="bi bi-download"></i></a>
+            </div>
+            <img src="/static/charts/monthly_trend_analysis.png?t={{ timestamp }}" class="img-fluid rounded border mt-2" alt="Monthly Trend Chart">
+        </div>
+    </div>
+
+    <!-- Chart 7: Weather vs Severity -->
+    <div class="col-lg-6">
+        <div class="card card-custom p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold mb-0">7. Environmental Weather Impact on Severity</h6>
+                <a href="/static/charts/weather_severity_matrix.png" download class="btn btn-sm btn-light border py-0 px-2"><i class="bi bi-download"></i></a>
+            </div>
+            <img src="/static/charts/weather_severity_matrix.png?t={{ timestamp }}" class="img-fluid rounded border mt-2" alt="Weather Matrix Chart">
+        </div>
+    </div>
+</div>
+
+<!-- Embedded Markdown Report Summary -->
+<div class="card card-custom p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+        <h5 class="fw-bold mb-0"><i class="bi bi-markdown me-2 text-primary"></i>Compiled Analytical Report (Markdown Preview)</h5>
+        <span class="small text-muted font-monospace">reports/accident_trend_report.md</span>
+    </div>
+    <div class="p-3 bg-light rounded border" style="max-height: 400px; overflow-y: auto;">
+        <pre class="mb-0" style="white-space: pre-wrap; font-family: monospace; font-size: 0.85rem;">{{ markdown_content }}</pre>
+    </div>
+</div>
+{% endblock %}

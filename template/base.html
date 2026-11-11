@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Road Accident Data Analysis System{% endblock %}</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Chart.js for interactive dynamic charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-navy: #1a2c3f;
+            --primary-accent: #2980b9;
+            --sidebar-width: 250px;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #2c3e50;
+            min-height: 100vh;
+        }
+        .navbar-brand-custom {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #ffffff !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .navbar-custom {
+            background: linear-gradient(135deg, #132230 0%, #1e3a53 100%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .disclaimer-banner {
+            background-color: #fff9e6;
+            border-bottom: 2px solid #f1c40f;
+            color: #7d5e00;
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-link.active {
+            font-weight: 600;
+            color: #3498db !important;
+            border-bottom: 2px solid #3498db;
+        }
+        .nav-link {
+            color: #cbd5e1 !important;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+        .nav-link:hover {
+            color: #ffffff !important;
+        }
+        .kpi-card {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid #eef2f6;
+            transition: transform 0.2s;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+        }
+        .kpi-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.5px;
+        }
+        .kpi-value {
+            font-size: 1.85rem;
+            font-weight: 700;
+            margin-top: 4px;
+            margin-bottom: 2px;
+        }
+        .card-custom {
+            background: #ffffff;
+            border-radius: 10px;
+            border: 1px solid #eef2f6;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+        }
+        .badge-severity-minor { background-color: #2ecc71; color: white; }
+        .badge-severity-moderate { background-color: #f39c12; color: white; }
+        .badge-severity-severe { background-color: #e67e22; color: white; }
+        .badge-severity-fatal { background-color: #c0392b; color: white; }
+        .table th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        footer {
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            padding: 16px 0;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: auto;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="d-flex flex-column">
+
+    <!-- Top Scientific Disclaimer Alert (Direct Acceptance Criteria) -->
+    <div class="disclaimer-banner">
+        <i class="bi bi-shield-exclamation fs-5 flex-shrink-0"></i>
+        <div>
+            <strong>Scientific & Analytical Notice:</strong> Findings describe statistical associations and patterns in recorded data. They should <u>not</u> be treated as proof of causation. Multi-factor interactions govern traffic incident dynamics.
+        </div>
+    </div>
+
+    <!-- Navigation Header -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top py-2">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand navbar-brand-custom" href="{{ url_for('dashboard') }}">
+                <i class="bi bi-activity fs-4 text-info"></i>
+                <span>Road Accident Data Analysis System</span>
+            </a>
+            <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}">
+                            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'records' %}active{% endif %}" href="{{ url_for('records_list') }}">
+                            <i class="bi bi-table me-1"></i> Accident Records
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'add_record' %}active{% endif %}" href="{{ url_for('add_record') }}">
+                            <i class="bi bi-plus-circle me-1"></i> Ingest Record
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'analytics' %}active{% endif %}" href="{{ url_for('analytics_view') }}">
+                            <i class="bi bi-graph-up-arrow me-1"></i> Pattern Analytics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'quality' %}active{% endif %}" href="{{ url_for('data_quality_view') }}">
+                            <i class="bi bi-patch-check me-1"></i> Data Quality & PII Audit
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if active_page == 'reports' %}active{% endif %}" href="{{ url_for('reports_view') }}">
+                            <i class="bi bi-file-earmark-bar-graph me-1"></i> Reports & Charts
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ url_for('import_csv') }}" class="btn btn-sm btn-outline-info">
+                        <i class="bi bi-upload me-1"></i> Import CSV
+                    </a>
+                    <a href="{{ url_for('export_csv') }}" class="btn btn-sm btn-outline-light">
+                        <i class="bi bi-download me-1"></i> Export Data
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div class="container-fluid px-4 mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Block -->
+    <main class="container-fluid px-4 py-3 flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container-fluid px-4 text-center">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-md-start">
+                    <strong>Project 13: Road Accident Data Analysis System</strong> &bull; Intermediate System
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <span>Database: MySQL 8.0 / SQLAlchemy &bull; NumPy & Pandas Engine &bull; Matplotlib Visuals</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
